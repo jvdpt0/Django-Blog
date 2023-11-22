@@ -1,28 +1,37 @@
+from typing import Any
 from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, DetailView
 
 from .models import Post
+from .forms import CommentForm
 
 
 # Create your views here.
 
+class LandingPageView(ListView):
+    template_name = 'blog/index.html'
+    model = Post
+    ordering = ['-date']
+    context_object_name = 'posts'
 
-def landing_page(request):
-    posts = Post.objects.all().order_by('-date')[:3]
-    return render(request, 'blog/index.html', {
-        'posts': posts
-    })
-
-
-def all_posts(request):
-    posts = Post.objects.all().order_by('-date')
-    return render(request, 'blog/all-posts.html', {
-        'posts': posts
-    })
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        data = queryset[:3]
+        return data
 
 
-def post(request, slug):
-    chosen_post = get_object_or_404(Post, slug=slug)
-    return render(request, 'blog/detailed-post.html', {
-        'post': chosen_post,
-        'tags': chosen_post.tag.all()
-    })
+class AllPostsView(ListView):
+    template_name = 'blog/all-posts.html'
+    model = Post
+    ordering = ['-date']
+    context_object_name = 'posts'
+
+class DetailedPostView(DetailView):
+    template_name = 'blog/detailed-post.html'
+    model = Post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()
+        context['tags'] = self.object.tag.all()
+        return context
