@@ -1,0 +1,23 @@
+{% extends 'base.html' %} 
+{% load static %} 
+
+{% block title %}Your Bookmarked Posts{% endblock %}
+
+{% block css_file %} 
+<link rel="stylesheet" href="{% static 'blog/read-later.css' %}">
+{% endblock %} 
+
+{% block content %}
+
+<section id="stored-posts">
+    {% if not has_posts %}
+    <p>You have no bookmarked posts.</p>
+    {% endif %}
+    <ul>
+    {% for post in posts %}
+        <li><a href="{% url 'post' post.slug %}"> {{ post.title }} </a></li>
+    {% endfor %}
+    </ul>
+</section>
+
+{% endblock %}
